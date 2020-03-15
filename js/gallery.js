@@ -10,6 +10,8 @@ const refs = {
   backdropRef: document.querySelector('div.lightbox__content'),
 };
 
+let defaultIndex;
+
 function createArrOfMarkup(arr, e, index) {
   const li = document.createElement('li');
   const a = document.createElement('a');
@@ -45,31 +47,48 @@ function onImageClick(event) {
     return;
   }
 
-  const defaulIndex = imgTarget.dataset.index;
-  window.addEventListener('keydown', a);
-
+  defaultIndex = Number(imgTarget.dataset.index);
   refs.modalRef.classList.add('is-open');
   refs.modalImgRef.src = imgTarget.dataset.source;
   refs.closeModalButton.addEventListener('click', closeModal);
   refs.backdropRef.addEventListener('click', closeOnClickBackdrop);
-  window.addEventListener('keydown', onPressEsc);
-}
-
-function a(e) {
-  if (e.code === 'ArrowRight') {
-    console.log(defaulIndex);
-  }
+  window.addEventListener('keydown', controlByButtons);
 }
 
 function closeModal() {
   refs.modalRef.classList.remove('is-open');
   refs.modalImgRef.src = '';
-  window.removeEventListener('keydown', onPressEsc);
+  window.removeEventListener('keydown', controlByButtons);
 }
 
 function closeOnClickBackdrop(e) {
   if (e.target === e.currentTarget) {
     closeModal();
+  }
+}
+
+function controlByButtons(e) {
+  onPressEsc(e);
+  nextImg(e);
+  prevImg(e);
+}
+
+function showNewImg() {
+  const newIndex = galleryItems[defaultIndex].original;
+  refs.modalImgRef.src = newIndex;
+}
+
+function nextImg(e) {
+  if (e.code === 'ArrowRight' && defaultIndex < galleryItems.length - 1) {
+    defaultIndex += 1;
+    showNewImg();
+  }
+}
+
+function prevImg(e) {
+  if (e.code === 'ArrowLeft' && defaultIndex > 0) {
+    defaultIndex -= 1;
+    showNewImg();
   }
 }
 
